@@ -16,10 +16,10 @@ private:
 	sf::RectangleShape bgShape;
 	sf::Texture bgImage;
 
+	std::vector<Button> buttons;
+
 	vector<sf::RectangleShape> eggShapes;
 	sf::Texture eggImage;
-
-	std::vector<Button> buttons;
 
 	int WolfPosition = 3; // 0 - LU, 1 - LD, 2 - RU, 3 - RD
 

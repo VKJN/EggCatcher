@@ -139,15 +139,27 @@ void Game::update() {
 		break;
 	}
 
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	moveEggs();
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
 	if (value % speed == 0) {
 		spawnCount++;
-		moveEggs();
 		if (spawnCount >= spawnRate) {
 			spawnCount = 0;
 			createRandomEgg();
 		}
-		//showInfoByEggs();
 	}
+
+	//if (value % speed == 0) {
+	//	spawnCount++;
+	//	moveEggs();
+	//	if (spawnCount >= spawnRate) {
+	//		spawnCount = 0;
+	//		createRandomEgg();
+	//	}
+	//	//showInfoByEggs();
+	//}
 }
 
 
@@ -195,7 +207,7 @@ void Game::showInfoByEggs() {
 
 void Game::moveEggs() {
 	for (int i = 0; i < 4; i++) {
-		for (int j = 6; j > 0; j--) {
+		for (int j = 5; j > 0; j--) {
 			swap(eggStatus[i][j], eggStatus[i][j - 1]);
 		}
 	}
@@ -206,7 +218,7 @@ void Game::incrementer() {
 	while (true) {
 		this_thread::sleep_for(chrono::milliseconds(100));
 		value++;
-		//cout << value << endl;
+		cout << value << endl;
 	}
 }
 
