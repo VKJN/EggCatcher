@@ -21,12 +21,17 @@ private:
 	vector<sf::RectangleShape> eggShapes;
 	sf::Texture eggImage;
 
+	sf::Text score;
+	sf::Font font;
+
 	int WolfPosition = 3; // 0 - LU, 1 - LD, 2 - RU, 3 - RD
 
 	int level = 1;
 	int speed = 10;
 	int spawnRate = 5;
 	int spawnCount = 0;
+
+	//int level[4] = { 5,10,15,20 };
 
 	int mistakes = 0;
 	bool eggStatus[4][6]{};
@@ -48,4 +53,5 @@ private:
 	void createRandomEgg();;
 	void moveEggs();
 	void showInfoByEggs();
+	void reset();
 };

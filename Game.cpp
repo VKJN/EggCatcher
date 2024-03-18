@@ -65,6 +65,12 @@ Game::Game()
 
 		eggShapes.push_back(shape);
 	}
+
+	font.loadFromFile("./font/Segment7Standard.otf");
+	score.setFont(font);
+	score.setPosition(sf::Vector2f(650, 150));
+	score.setFillColor(sf::Color::Black);
+	score.setCharacterSize(70);
 }
 
 
@@ -139,27 +145,36 @@ void Game::update() {
 		break;
 	}
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
-	moveEggs();
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-	if (value % speed == 0) {
+	if (value >= speed) {
 		spawnCount++;
+		moveEggs();
 		if (spawnCount >= spawnRate) {
 			spawnCount = 0;
 			createRandomEgg();
 		}
+		value = 0;
+
+		if (countCaughtEggs % (5 * level) == 0 && countCaughtEggs > 0) {
+			if (spawnRate > 1) {
+				spawnRate--;
+				level++;
+			}
+		}
+
+		if (countCaughtEggs % (10 * level) == 0 && countCaughtEggs > 0) {
+			if (speed > 4) { 
+				speed--; 
+			}
+		}
+
 	}
 
-	//if (value % speed == 0) {
-	//	spawnCount++;
-	//	moveEggs();
-	//	if (spawnCount >= spawnRate) {
-	//		spawnCount = 0;
-	//		createRandomEgg();
-	//	}
-	//	//showInfoByEggs();
-	//}
+	score.setString(to_string(countCaughtEggs));
+
+	if (mistakes == 3) {
+		window.close();
+		exit(0);
+	}
 }
 
 
@@ -181,9 +196,7 @@ void Game::render() {
 		}
 	}
 
-	/*for (auto egg : eggShapes) {
-		window.draw(egg);
-	}*/
+	window.draw(score);
 
 	window.display();
 }
@@ -204,11 +217,36 @@ void Game::showInfoByEggs() {
 	cout << endl;
 }
 
+void Game::reset() {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 6; j++) {
+			eggStatus[i][j] = false;
+		}
+	}
+
+	int level = 1;
+	int speed = 10;
+	int spawnRate = 5;
+	int spawnCount = 0;
+}
+
 
 void Game::moveEggs() {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 5; j > 0; j--) {
+			if (j == 5) {
+				if (eggStatus[i][j] == 1) {
+					mistakes++;
+					reset();
+				}
+			}
+
 			swap(eggStatus[i][j], eggStatus[i][j - 1]);
+
+			if (j == 4 && eggStatus[i][j] == 1 && WolfPosition == i) {
+					eggStatus[i][j] = 0;
+					countCaughtEggs++;
+			}
 		}
 	}
 }
@@ -218,7 +256,7 @@ void Game::incrementer() {
 	while (true) {
 		this_thread::sleep_for(chrono::milliseconds(100));
 		value++;
-		cout << value << endl;
+		//cout << value << endl;
 	}
 }
 
