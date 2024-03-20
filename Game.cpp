@@ -71,6 +71,17 @@ Game::Game()
 	score.setPosition(sf::Vector2f(650, 150));
 	score.setFillColor(sf::Color::Black);
 	score.setCharacterSize(70);
+
+	chickenShape.setSize(sf::Vector2f(605, 440));
+
+	lifeTexture.loadFromFile("./image/mistake.png");
+	for (int i = 0; i < 3; i++) {
+		sf::RectangleShape shape;
+		shape.setTexture(&lifeTexture);
+		shape.setPosition(sf::Vector2f(310 + i * 40, 160));
+		shape.setSize(sf::Vector2f(605, 340));
+		lifes.push_back(shape);
+	}
 }
 
 
@@ -158,6 +169,7 @@ void Game::update() {
 			if (spawnRate > 1) {
 				spawnRate--;
 				level++;
+				bunnyState = 1;
 			}
 		}
 
@@ -167,14 +179,19 @@ void Game::update() {
 			}
 		}
 
+		if (bunnyState != 0 && ticks < 3) {
+			if (value % 5 == 0) bunnyAnimation();
+			ticks++;
+		}
+
+		else {
+			bunnyState = 0;
+			ticks = 0;
+		}
+
 	}
 
 	score.setString(to_string(countCaughtEggs));
-
-	if (mistakes == 3) {
-		window.close();
-		exit(0);
-	}
 }
 
 
@@ -198,7 +215,37 @@ void Game::render() {
 
 	window.draw(score);
 
-	window.display();
+	for (int i = 0; i < mistakes; i++) {
+		window.draw(lifes[i]);
+	}
+
+	if (statusChickenAnimation != 0) {
+		while (statusChickenAnimation < 5) {
+			chickenAnimation();
+			statusChickenAnimation++;
+
+			window.clear();
+			window.draw(bgShape);
+			window.draw(screenShape);
+			window.draw(chickenShape);
+			window.draw(score);
+			for (int i = 0; i < mistakes; i++) {
+				window.draw(lifes[i]);
+			}
+			window.display();
+
+			Sleep(500);
+		}
+		statusChickenAnimation = 0;
+	}
+	
+	if (bunnyState != 0) window.draw(bunny);
+
+	if (mistakes == 3) {
+		gameOver();
+	}
+
+	else window.display();
 }
 
 
@@ -230,22 +277,52 @@ void Game::reset() {
 	int spawnCount = 0;
 }
 
+void Game::chickenAnimation() {
+	string path = "";
+	if (failSide < 2) {
+		path = "./image/chickenl" + to_string(statusChickenAnimation) + ".png";
+		chickenShape.setPosition(sf::Vector2f(270, 138));
+	}
+	else {
+		path = "./image/chickenr" + to_string(statusChickenAnimation) + ".png";
+		chickenShape.setPosition(sf::Vector2f(380, 138));
+	}
+	chickenTexture.loadFromFile(path);
+	chickenShape.setTexture(&chickenTexture);
+}
+
+void Game::gameOver() {
+	reset();
+	mistakes = 0;
+	countCaughtEggs = 0;
+	value = 0;
+}
+
+void Game::bunnyAnimation() {
+	bunny.setPosition(sf::Vector2f(250, 190));
+	bunnyState++;
+	if (bunnyState > 2) bunnyState = 1;
+	bunnyTexture.loadFromFile("./image/lvlup" + to_string(bunnyState) + ".png");
+	bunny.setTexture(&bunnyTexture);
+}
 
 void Game::moveEggs() {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 5; j > 0; j--) {
+			swap(eggStatus[i][j], eggStatus[i][j - 1]);
+			if (j == 5 && eggStatus[i][j] == 1) {
+				if (i == WolfPosition) {
+					eggStatus[i][j] = 0;
+					countCaughtEggs++;
+				}
+			}
 			if (j == 5) {
 				if (eggStatus[i][j] == 1) {
 					mistakes++;
+					failSide = i;
+					statusChickenAnimation = 1;
 					reset();
 				}
-			}
-
-			swap(eggStatus[i][j], eggStatus[i][j - 1]);
-
-			if (j == 4 && eggStatus[i][j] == 1 && WolfPosition == i) {
-					eggStatus[i][j] = 0;
-					countCaughtEggs++;
 			}
 		}
 	}

@@ -21,6 +21,19 @@ private:
 	vector<sf::RectangleShape> eggShapes;
 	sf::Texture eggImage;
 
+	sf::RectangleShape chickenShape;
+	sf::Texture chickenTexture;
+	int statusChickenAnimation; // 0 - none  1-4 - animation 
+	int failSide = 0;
+
+	vector<sf::RectangleShape> lifes;
+	sf::Texture lifeTexture;
+
+	sf::RectangleShape bunny;
+	sf::Texture bunnyTexture;
+	int bunnyState = 0;
+	int ticks = 0;
+
 	sf::Text score;
 	sf::Font font;
 
@@ -30,8 +43,6 @@ private:
 	int speed = 10;
 	int spawnRate = 5;
 	int spawnCount = 0;
-
-	//int level[4] = { 5,10,15,20 };
 
 	int mistakes = 0;
 	bool eggStatus[4][6]{};
@@ -54,4 +65,7 @@ private:
 	void moveEggs();
 	void showInfoByEggs();
 	void reset();
+	void chickenAnimation();
+	void gameOver();
+	void bunnyAnimation();
 };
