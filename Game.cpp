@@ -1,4 +1,4 @@
-#include "Game.h"
+Ôªø#include "Game.h"
 #include <Windows.h>
 
 Game::Game()
@@ -26,33 +26,33 @@ Game::Game()
 
 	eggImage.loadFromFile("./image/egg.png");
 
-	int posEggs[24][3] = {  {330, 265, 20},
+	int posEggs[24][3] = { {330, 265, 20},
 							{370, 275, 80},
 							{400, 300, 140},
 							{420, 325, 180},
 							{440, 350, 220},
-							{450, 510, 200}, // ”Ô‡ÎÓ
+							{450, 510, 200}, // √ì√Ø√†√´√Æ
 
 							{330, 365, 20},
 							{370, 375, 80},
 							{400, 400, 140},
 							{420, 425, 180},
 							{440, 450, 220},
-							{450, 510, 200}, // ”Ô‡ÎÓ
+							{450, 510, 200}, // √ì√Ø√†√´√Æ
 
 							{870, 293, 200},
 							{854, 290, 140},
 							{820, 288, 80},
 							{780, 302, 20},
 							{745, 345, -40},
-							{765, 510, 200}, // ”Ô‡ÎÓ
+							{765, 510, 200}, // √ì√Ø√†√´√Æ
 
 							{870, 393, 200},
 							{854, 390, 140},
 							{820, 388, 80},
 							{780, 402, 20},
 							{745, 445, -40},
-							{765, 510, 200}, // ”Ô‡ÎÓ
+							{765, 510, 200}, // √ì√Ø√†√´√Æ
 	};
 
 	for (int i = 0; i < 24; i++) {
@@ -72,9 +72,10 @@ Game::Game()
 	score.setFillColor(sf::Color::Black);
 	score.setCharacterSize(70);
 
+	bunny.setSize(sf::Vector2f(605, 340));
 	chickenShape.setSize(sf::Vector2f(605, 440));
-
 	lifeTexture.loadFromFile("./image/mistake.png");
+
 	for (int i = 0; i < 3; i++) {
 		sf::RectangleShape shape;
 		shape.setTexture(&lifeTexture);
@@ -96,7 +97,7 @@ void Game::processEvents() {
 		if (event.type == sf::Event::Closed) {
 			window.close();
 		}
-		if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left 
+		if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left
 			|| event.type == sf::Event::MouseButtonReleased) {
 			sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 			int count = 0;
@@ -165,7 +166,7 @@ void Game::update() {
 		}
 		value = 0;
 
-		if (countCaughtEggs % (5 * level) == 0 && countCaughtEggs > 0) {
+		if ((countCaughtEggs % (3 * level)) == 0 && countCaughtEggs > 0) {
 			if (spawnRate > 1) {
 				spawnRate--;
 				level++;
@@ -173,14 +174,13 @@ void Game::update() {
 			}
 		}
 
-		if (countCaughtEggs % (10 * level) == 0 && countCaughtEggs > 0) {
-			if (speed > 4) { 
-				speed--; 
-			}
+		if ((countCaughtEggs % (20 * level)) == 0 && countCaughtEggs > 0) {
+			bunnyState = 1;
+			if (speed > 4) speed--; 
 		}
 
 		if (bunnyState != 0 && ticks < 3) {
-			if (value % 5 == 0) bunnyAnimation();
+			if (value % 5 == 0) bunnyAnimation(); 
 			ticks++;
 		}
 
@@ -188,7 +188,6 @@ void Game::update() {
 			bunnyState = 0;
 			ticks = 0;
 		}
-
 	}
 
 	score.setString(to_string(countCaughtEggs));
@@ -212,7 +211,6 @@ void Game::render() {
 			count++;
 		}
 	}
-
 	window.draw(score);
 
 	for (int i = 0; i < mistakes; i++) {
@@ -228,17 +226,17 @@ void Game::render() {
 			window.draw(bgShape);
 			window.draw(screenShape);
 			window.draw(chickenShape);
-			window.draw(score);
 			for (int i = 0; i < mistakes; i++) {
 				window.draw(lifes[i]);
 			}
+			window.draw(score);
 			window.display();
 
 			Sleep(500);
 		}
 		statusChickenAnimation = 0;
 	}
-	
+
 	if (bunnyState != 0) window.draw(bunny);
 
 	if (mistakes == 3) {
@@ -265,16 +263,16 @@ void Game::showInfoByEggs() {
 }
 
 void Game::reset() {
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 6; j++) {
-			eggStatus[i][j] = false;
-		}
-	}
-
 	int level = 1;
 	int speed = 10;
 	int spawnRate = 5;
 	int spawnCount = 0;
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 6; j++) {
+			eggStatus[i][j] = 0;
+		}
+	}
 }
 
 void Game::chickenAnimation() {
@@ -299,10 +297,12 @@ void Game::gameOver() {
 }
 
 void Game::bunnyAnimation() {
-	bunny.setPosition(sf::Vector2f(250, 190));
+	bunny.setPosition(sf::Vector2f(255, 180));
 	bunnyState++;
 	if (bunnyState > 2) bunnyState = 1;
-	bunnyTexture.loadFromFile("./image/lvlup" + to_string(bunnyState) + ".png");
+
+	string path = "./Image/lvlup" + to_string(bunnyState) + ".png";
+	bunnyTexture.loadFromFile(path);
 	bunny.setTexture(&bunnyTexture);
 }
 
